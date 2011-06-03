@@ -1,0 +1,5 @@
+First Person Shooter in Node.js / Three.js using socket.io
+
+$ node gameServer.js
+
+hit localhost:8000 in a modern browser (needs: canvas/webgl/websockets)
