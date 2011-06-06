@@ -14,13 +14,13 @@ $(document).ready(function() {
     socket = new io.Socket(null, {port: 8000, rememberTransport: false});
     socket.connect();
     socket.on('message', function(obj){
-        if ('clients' in obj){
+	if ('message' in obj) {
+	    handleClient(obj.message[0], obj.message[1]);	    
+	} else if ('clients' in obj){
             for (var client in obj.clients) {
 		handleClient(client, obj.clients[client]);
 	    }
-        } else if ('message' in obj) {
-	    handleClient(obj.message[0], obj.message[1]);	    
-	} else if ('disconnect' in obj) {
+        } else if ('disconnect' in obj) {
 	    scene.removeObject(balls[obj.disconnect]);
 	    delete balls[obj.disconnect];
 	}
