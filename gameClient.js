@@ -81,10 +81,9 @@ function Message(position, color) {
     
 function loop() {
     var msg = new Message(camera.position, color);
-    var message = {x: msg.x, y: msg.y, z: msg.z, color: msg.color};
     var msgString = '{x: '+msg.x+', y: '+msg.y+', z: '+msg.z+', color: '+msg.color+'}';
     console.log("sending: " + msgString);
-    socket.send(message);
+    socket.send(msg);
     renderer.render( scene, camera );
 }
 
@@ -100,6 +99,11 @@ function init() {
     camera.position.x = (-xLimit + 50);
     camera.position.y = (-yLimit + 50);
     camera.position.z = Math.random() * zLimit;
+
+    camera.target.x = Math.random() * xLimit;
+    camera.target.y = Math.random() * yLimit;
+    camera.target.z = Math.random() * zLimit;
+
     color = Math.random() * 0xffffff;
     
     scene = new THREE.Scene();
