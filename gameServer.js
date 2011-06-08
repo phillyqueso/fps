@@ -35,19 +35,25 @@ send404 = function(res, msg){
 server.listen(8000);
 
 var clients = new Array();
+//var bullets = new Array();
 
 // socket.io 
 var socket = io.listen(server); 
-socket.on('connection', function(client){ 
+socket.on('connection', function(client) {
     if (clients.length > 0)
 	client.send({ clients: clients});
     console.log(client.sessionId + ' connected.\n');
-    client.on('message', function(message){
-	clients[client.sessionId] = message; //update latest position, etc.
-	//console.log(client.sessionId + ' broadcasting new info: '+message.x+ ' ' +message.y+ ' ' +message.z+ ' ' +message.color);
-	return client.broadcast({ message: [client.sessionId, message]});
+    client.on('message', function(message) {
+	if ('bullet' in message) {
+	    //console.log(client.sessionId+": fired bullet");
+	    return client.broadcast(message);
+	} else {
+	    clients[client.sessionId] = message; //update latest position, etc.
+	    //console.log(client.sessionId + ' broadcasting new info: '+message.x+ ' ' +message.y+ ' ' +message.z+ ' ' +message.color);
+	    return client.broadcast({ message: [client.sessionId, message]});
+	}
     })
-    client.on('disconnect', function(){
+    client.on('disconnect', function() {
 	delete clients[client.sessionId];
 	return client.broadcast({ disconnect: [client.sessionId]});
     }) 
