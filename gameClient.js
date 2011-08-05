@@ -9,6 +9,7 @@ var bullets = new Array();
 var color;
 
 var socket;
+var id;
 
 $(document).ready(function() {
     init();
@@ -24,10 +25,23 @@ $(document).ready(function() {
 	    var speed = new THREE.Vector3();
 	    speed.set(obj.bullet[1].x, obj.bullet[1].y, obj.bullet[1].z);
 	    AddBullet(position, speed, obj.bullet[2]);
-	} else if ('clients' in obj) {
-            for (var client in obj.clients) {
-		handleClient(client, obj.clients[client]);
+	} else if ('id' in obj) {
+	    id = obj.id;
+	} else if ('hit' in obj) {
+	    if (id == obj.hit) { //you're dead
+		var answer = confirm("play again?");
+		if (answer) {
+		    window.location.reload();
+		} else {
+		    window.location = "http://google.com";
+		}
+	    } else {
+		if (id == obj.by) { //you killed
+		    console.log("you killed: "+obj.hit);
+		}
+		scene.removeObject(balls[obj.hit]);
 	    }
+	    
         } else if ('disconnect' in obj) {
 	    scene.removeObject(balls[obj.disconnect]);
 	    delete balls[obj.disconnect];
@@ -126,11 +140,10 @@ function loop() {
 		 ( position.z >= zLimit || position.z <= -zLimit ) ) {
 		// has bullet reached limit?
 		scene.removeObject(bullet.particle);
-		delete bullets[j];
+		bullets.splice(j,1);
 	    }
 	}
     }
-
     renderer.render( scene, camera );
 }
 
@@ -141,7 +154,8 @@ function init() {
 				    'movementSpeed': 500,
 				    'lookSpeed': 0.2,
 				    'lookVertical': true,
-				    'noFly': true
+				    'noFly': true,
+				    'moveOnClick': false
 				   });
     camera.position.x = (-xLimit + 50);
     camera.position.y = (-yLimit + 50);
