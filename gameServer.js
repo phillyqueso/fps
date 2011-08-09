@@ -1,7 +1,8 @@
 const http = require('http'),
-      url = require('url'),
-      fs = require('fs'),
-      io = require('socket.io');
+url = require('url'),
+fs = require('fs'),
+io = require('socket.io'),
+vector3 = require('./libs/vector3.js');
 
 server = http.createServer(function(req, res){
     var path = url.parse(req.url).pathname;
@@ -70,14 +71,15 @@ var zLimit = 1000;
 function bulletHandler() {
     for (var i = 0; i < bullets.length; i++) {
 	//update position
-	bullets[i] = vectorAddSelf(bullets[i]);
+	bullets[i] = vector3.vectorAddSelf(bullets[i]);
 
 	for (var player in players) {
 	    if (player != bullets[i].clientOrigin) {
 		//scale 1.5 25
-		var d = distanceTo(players[player], bullets[i].position);
+		var d = vector3.distanceTo(players[player], bullets[i].position);
 		//console.log("distance between bullet:" + bullets[i].clientOrigin + " and player:" + player + " is: "+d);
-		if (d <= (1.5 + 25)) {
+		//if (d <= (1.5 + 25)) {
+		if (d <= (30)) {
 		    console.log(bullets[i].clientOrigin + " hit player : " + player);
 		    socket.broadcast({hit: player, by: bullets[i].clientOrigin});
 		}
@@ -92,42 +94,4 @@ function bulletHandler() {
 	    bullets.splice(i,1);
 	}
     }
-}
-
-
-//thee.js functions
-
-var vectorAddSelf = function(obj) {
-    obj.position.x += obj.speed.x;
-    obj.position.y += obj.speed.y;
-    obj.position.z += obj.speed.z;
-    return obj;
-}
-
-var distanceTo = function ( v1, v2 ) {
-    return Math.sqrt( distanceToSquared( v1, v2 ) );
-}
-
-var distanceToSquared = function ( v1, v2 ) {
-    var obj = sub( v1, v2 );
-    return lengthSq(obj);
-}
-
-var lengthSq = function (obj) {
-    return obj.x * obj.x + obj.y * obj.y + obj.z * obj.z;
-}
-
-var sub = function ( v1, v2 ) {
-    var obj = new vector3();
-    obj.x = v1.x - v2.x;
-    obj.y = v1.y - v2.y;
-    obj.z = v1.z - v2.z;
-    return obj;
-}
-
-var vector3 = function(x, y, z) {
-    this.x = x ? x : 0;
-    this.y = y ? y : 0;
-    this.z = z ? z : 0;
-    return this;
 }
